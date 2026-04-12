@@ -1,0 +1,33 @@
+{
+  "name": "Post",
+  "type": "object",
+  "properties": {
+    "video_url": {
+      "type": "string",
+      "description": "URL of the video or image"
+    },
+    "caption": {
+      "type": "string"
+    },
+    "likes": {
+      "type": "number",
+      "default": 0
+    },
+    "comments": {
+      "type": "number",
+      "default": 0
+    },
+    "username": {
+      "type": "string"
+    },
+    "avatar": {
+      "type": "string"
+    },
+    "filter_used": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "video_url"
+  ]
+}

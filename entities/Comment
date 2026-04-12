@@ -1,0 +1,22 @@
+{
+  "name": "Comment",
+  "type": "object",
+  "properties": {
+    "post_id": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    },
+    "avatar": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "post_id",
+    "text"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "SavedPost",
+  "type": "object",
+  "properties": {
+    "post_id": {
+      "type": "string"
+    },
+    "post_video_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "post_id"
+  ]
+}
