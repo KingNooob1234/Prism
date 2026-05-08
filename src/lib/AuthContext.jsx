@@ -42,7 +42,15 @@ export const AuthProvider = ({ children }) => {
         setAppPublicSettings(publicSettings);
         
         // If we got the app public settings successfully, check if user is authenticated
-        if (appParams.token) {
+        // Check appParams.token first, then fall back to localStorage (SDK may have saved it)
+        const storedToken = appParams.token
+          || (typeof window !== 'undefined' && (
+            window.localStorage.getItem('base44_access_token') ||
+            window.localStorage.getItem('token')
+          ));
+        if (storedToken) {
+          // Ensure the base44 client always has the token set
+          base44.setToken(storedToken);
           await checkUserAuth();
         } else {
           setIsLoadingAuth(false);

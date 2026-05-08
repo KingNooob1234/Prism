@@ -103,6 +103,16 @@ const getAppParams = () => {
 	if (resolvedToken) {
 		storage.setItem('base44_access_token', resolvedToken);
 	}
+
+	// Debug: log auth state on every page load (helps diagnose login issues)
+	if (!isNode) {
+		console.log('[Prism Auth] URL search:', window.location.search);
+		console.log('[Prism Auth] URL hash:', window.location.hash);
+		console.log('[Prism Auth] Token from URL:', tokenFromLocation ? 'FOUND ✅' : 'not found');
+		console.log('[Prism Auth] Token in localStorage:', storage.getItem('base44_access_token') ? 'FOUND ✅' : 'not found');
+		console.log('[Prism Auth] Final token:', resolvedToken ? 'SET ✅' : 'NONE ❌ (user is Guest)');
+	}
+
 	return {
 		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID }),
 		token: resolvedToken,
