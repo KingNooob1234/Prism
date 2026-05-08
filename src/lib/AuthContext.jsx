@@ -21,11 +21,15 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);
+
+      const appPublicApiBase = appParams.appBaseUrl
+        ? `${appParams.appBaseUrl.replace(/\/$/, '')}/api/apps/public`
+        : '/api/apps/public';
       
       // First, check app public settings (with token if available)
       // This will tell us if auth is required, user not registered, etc.
       const appClient = createAxiosClient({
-        baseURL: `/api/apps/public`,
+        baseURL: appPublicApiBase,
         headers: {
           'X-App-Id': appParams.appId
         },
