@@ -6,17 +6,34 @@ const toSnakeCase = (str) => {
 	return str.replace(/([A-Z])/g, '_$1').toLowerCase();
 }
 
+const getHashParams = () => {
+	if (isNode) {
+		return new URLSearchParams();
+	}
+	const hash = window.location.hash || '';
+	const queryIndex = hash.indexOf('?');
+	if (queryIndex === -1) {
+		return new URLSearchParams();
+	}
+	return new URLSearchParams(hash.slice(queryIndex + 1));
+}
+
 const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl = false } = {}) => {
 	if (isNode) {
 		return defaultValue;
 	}
 	const storageKey = `base44_${toSnakeCase(paramName)}`;
 	const urlParams = new URLSearchParams(window.location.search);
-	const searchParam = urlParams.get(paramName);
+	const hashParams = getHashParams();
+	const searchParam = urlParams.get(paramName) || hashParams.get(paramName);
 	if (removeFromUrl) {
 		urlParams.delete(paramName);
+		hashParams.delete(paramName);
+		const hashBase = window.location.hash.split('?')[0];
+		const nextHashQuery = hashParams.toString();
+		const nextHash = `${hashBase}${nextHashQuery ? `?${nextHashQuery}` : ''}`;
 		const newUrl = `${window.location.pathname}${urlParams.toString() ? `?${urlParams.toString()}` : ""
-			}${window.location.hash}`;
+			}${nextHash}`;
 		window.history.replaceState({}, document.title, newUrl);
 	}
 	if (searchParam) {
