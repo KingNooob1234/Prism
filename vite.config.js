@@ -1,10 +1,17 @@
-mport base44 from "@base44/vite-plugin"
+import base44 from "@base44/vite-plugin"
+import { fileURLToPath, URL } from 'node:url'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: process.env.GITHUB_ACTIONS === 'true' ? '/Prism/' : '/',
   logLevel: 'error', // Suppress warnings, only show errors
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  },
   plugins: [
     base44({
       // Support for legacy code that imports the base44 SDK with @/integrations, @/entities, etc.

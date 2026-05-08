@@ -3,7 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import NavigationTracker from '@/lib/NavigationTracker'
 import { pagesConfig } from './pages.config'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, HashRouter, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import Flips from './pages/Flips';
 import NewFlip from './pages/NewFlip';
@@ -13,6 +13,9 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 const { Pages, Layout, mainPage } = pagesConfig;
 const mainPageKey = mainPage ?? Object.keys(Pages)[0];
 const MainPage = mainPageKey ? Pages[mainPageKey] : <></>;
+const Router = typeof window !== 'undefined' && window.location.hostname.endsWith('github.io')
+  ? HashRouter
+  : BrowserRouter;
 
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
@@ -37,7 +40,14 @@ const AuthenticatedApp = () => {
     } else if (authError.type === 'auth_required') {
       // Redirect to login automatically
       navigateToLogin();
-      return null;
+      return (
+        <div className="fixed inset-0 flex items-center justify-center bg-black text-white px-6 text-center">
+          <div>
+            <p className="text-lg font-semibold">Redirecting to sign in...</p>
+            <p className="mt-2 text-sm text-white/60">If nothing happens, refresh the page and check your Base44 app settings.</p>
+          </div>
+        </div>
+      );
     }
   }
 
