@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { ArrowLeft, Grid, UserPlus, CheckCircle, Lock, MessageSquare } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { buildLoginUrl } from '@/lib/app-params';
 
 export default function CreatorProfile() {
     const location = useLocation();
@@ -59,7 +60,7 @@ export default function CreatorProfile() {
     }, [creatorEmail]);
 
     const sendFriendRequest = async () => {
-        if (!currentUser) { base44.auth.redirectToLogin(); return; }
+        if (!currentUser) { window.location.href = buildLoginUrl(`${window.location.origin}${window.location.pathname}`); return; }
         setFollowStatus('pending');
         const req = await base44.entities.FriendRequest.create({
             from_email: currentUser.email,

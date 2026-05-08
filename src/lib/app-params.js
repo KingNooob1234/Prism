@@ -116,3 +116,24 @@ const getAppParams = () => {
 export const appParams = {
 	...getAppParams()
 }
+
+export const buildLoginUrl = (fromUrl) => {
+	if (isNode) {
+		return '';
+	}
+
+	const base = (appParams.appBaseUrl || window.location.origin).replace(/\/$/, '');
+	const callback = fromUrl || `${window.location.origin}${window.location.pathname}`;
+	const loginUrl = new URL('/login', base);
+	loginUrl.searchParams.set('from_url', callback);
+
+	if (appParams.appId) {
+		loginUrl.searchParams.set('app_id', appParams.appId);
+	}
+
+	if (appParams.appBaseUrl) {
+		loginUrl.searchParams.set('app_base_url', appParams.appBaseUrl);
+	}
+
+	return loginUrl.toString();
+}

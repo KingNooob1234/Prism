@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, UserPlus, Clock, CheckCircle, Bell } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { buildLoginUrl } from '@/lib/app-params';
 
 export default function FindFriends() {
     const [query, setQuery] = useState('');
@@ -56,7 +57,7 @@ export default function FindFriends() {
     }, [currentUser?.email]);
 
     const sendRequest = async (targetUser) => {
-        if (!currentUser) { base44.auth.redirectToLogin(); return; }
+        if (!currentUser) { window.location.href = buildLoginUrl(`${window.location.origin}${window.location.pathname}`); return; }
         setSentRequests(p => ({ ...p, [targetUser.email]: 'pending' }));
         base44.entities.FriendRequest.create({
             from_email: currentUser.email,
