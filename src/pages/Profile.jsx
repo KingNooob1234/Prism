@@ -50,7 +50,10 @@ export default function Profile() {
         setDeletingPost(null);
     };
 
-    const handleLogin = () => base44.auth.redirectToLogin();
+    const handleLogin = () => {
+        const callbackUrl = `${window.location.origin}${window.location.pathname}`;
+        base44.auth.redirectToLogin(callbackUrl);
+    };
     const handleLogout = () => base44.auth.logout();
 
     const openEditProfile = () => {

@@ -128,8 +128,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const navigateToLogin = () => {
-    // Use the SDK's redirectToLogin method
-    base44.auth.redirectToLogin(window.location.href);
+    // Keep callback URL simple for static hosts with hash routing.
+    const callbackUrl = `${window.location.origin}${window.location.pathname}`;
+    base44.auth.redirectToLogin(callbackUrl);
   };
 
   return (

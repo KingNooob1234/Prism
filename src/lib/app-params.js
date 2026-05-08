@@ -11,6 +11,13 @@ const getHashParams = () => {
 		return new URLSearchParams();
 	}
 	const hash = window.location.hash || '';
+	const trimmedHash = hash.startsWith('#') ? hash.slice(1) : hash;
+
+	// Support callbacks like "#access_token=..." or "#token=...".
+	if (trimmedHash.includes('=') && !trimmedHash.includes('/')) {
+		return new URLSearchParams(trimmedHash);
+	}
+
 	const queryIndex = hash.indexOf('?');
 	if (queryIndex === -1) {
 		return new URLSearchParams();
@@ -54,11 +61,13 @@ const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl =
 const getAppParams = () => {
 	if (getAppParamValue("clear_access_token") === 'true') {
 		storage.removeItem('base44_access_token');
+		storage.removeItem('base44_token');
 		storage.removeItem('token');
 	}
+	const resolvedToken = getAppParamValue("access_token", { removeFromUrl: true }) || getAppParamValue("token", { removeFromUrl: true });
 	return {
 		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID }),
-		token: getAppParamValue("access_token", { removeFromUrl: true }),
+		token: resolvedToken,
 		fromUrl: getAppParamValue("from_url", { defaultValue: window.location.href }),
 		functionsVersion: getAppParamValue("functions_version", { defaultValue: import.meta.env.VITE_BASE44_FUNCTIONS_VERSION }),
 		appBaseUrl: getAppParamValue("app_base_url", { defaultValue: import.meta.env.VITE_BASE44_APP_BASE_URL }),
