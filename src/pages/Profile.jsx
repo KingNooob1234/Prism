@@ -20,17 +20,16 @@ export default function Profile() {
     useEffect(() => {
         const load = async () => {
             try {
-                const isAuth = await base44.auth.isAuthenticated();
-                if (isAuth) {
-                    const userData = await base44.auth.me();
-                    setUser(userData);
-                    const [saved, posts] = await Promise.all([
-                        base44.entities.SavedPost.list('-created_date'),
-                        base44.entities.Post.filter({ created_by: userData.email }, '-created_date')
-                    ]);
-                    setSavedPosts(saved || []);
-                    setMyPosts(posts || []);
-                }
+                const userData = await base44.auth.me();
+                if (!userData) return;
+
+                setUser(userData);
+                const [saved, posts] = await Promise.all([
+                    base44.entities.SavedPost.list('-created_date'),
+                    base44.entities.Post.filter({ created_by: userData.email }, '-created_date')
+                ]);
+                setSavedPosts(saved || []);
+                setMyPosts(posts || []);
             } catch (_) {}
             setIsLoading(false);
         };

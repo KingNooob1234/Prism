@@ -64,7 +64,16 @@ const getAppParams = () => {
 		storage.removeItem('base44_token');
 		storage.removeItem('token');
 	}
-	const resolvedToken = getAppParamValue("access_token", { removeFromUrl: true }) || getAppParamValue("token", { removeFromUrl: true });
+	const resolvedToken =
+		getAppParamValue("access_token", { removeFromUrl: true }) ||
+		getAppParamValue("token", { removeFromUrl: true }) ||
+		storage.getItem('token') ||
+		storage.getItem('base44_access_token') ||
+		storage.getItem('base44_token');
+
+	if (resolvedToken) {
+		storage.setItem('base44_access_token', resolvedToken);
+	}
 	return {
 		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID }),
 		token: resolvedToken,
