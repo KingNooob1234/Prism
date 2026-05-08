@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { appParams, buildLoginUrl } from '@/lib/app-params';
+import { appParams, openLoginPopup } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 
 const AuthContext = createContext();
@@ -138,7 +138,7 @@ export const AuthProvider = ({ children }) => {
   const navigateToLogin = () => {
     // Keep callback URL simple for static hosts with hash routing.
     const callbackUrl = `${window.location.origin}${window.location.pathname}`;
-    window.location.href = buildLoginUrl(callbackUrl);
+    openLoginPopup(callbackUrl);
   };
 
   return (

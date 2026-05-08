@@ -5,7 +5,7 @@ import { RefreshCw } from 'lucide-react';
 import FeedItem from '../components/FeedItem.jsx';
 import { base44 } from '@/api/base44Client';
 import { requestNotificationPermission, sendNotification } from '../lib/useNotifications';
-import { buildLoginUrl } from '@/lib/app-params';
+import { openLoginPopup } from '@/lib/app-params';
 
 export default function Home() {
     const [posts, setPosts] = useState([]);
@@ -113,7 +113,7 @@ export default function Home() {
             {/* Top Bar */}
             <div className="absolute top-0 left-0 w-full bg-gradient-to-b from-black/80 via-black/40 to-transparent z-40 flex justify-center items-center space-x-6 text-white/90 font-medium tracking-wide pointer-events-none"
                 style={{ paddingTop: 'calc(env(safe-area-inset-top) + 2rem)', paddingBottom: '1.5rem' }}>
-                <button className={`relative flex flex-col items-center pointer-events-auto transition-opacity ${activeTab === 'following' ? 'opacity-100 font-bold' : 'opacity-50'}`} onClick={() => { if (!user) { window.location.href = buildLoginUrl(`${window.location.origin}${window.location.pathname}`); return; } setActiveTab('following'); }}>
+                <button className={`relative flex flex-col items-center pointer-events-auto transition-opacity ${activeTab === 'following' ? 'opacity-100 font-bold' : 'opacity-50'}`} onClick={() => { if (!user) { openLoginPopup(`${window.location.origin}${window.location.pathname}`); return; } setActiveTab('following'); }}>
                     Following
                     {activeTab === 'following' && <div className="absolute -bottom-2 w-1 h-1 rounded-full bg-white" />}
                 </button>
@@ -146,7 +146,7 @@ export default function Home() {
                     <div className="h-screen w-full flex flex-col items-center justify-center gap-4 text-white/40 px-8 text-center">
                         <p className="text-lg">No posts yet</p>
                         <p className="text-sm">{activeTab === 'following' ? 'Add friends to see their posts here' : 'Be the first to post!'}</p>
-                        {activeTab === 'following' && !user && <button onClick={() => { window.location.href = buildLoginUrl(`${window.location.origin}${window.location.pathname}`); }} className="px-6 py-3 bg-white text-black font-semibold rounded-2xl text-sm">Sign In</button>}
+                        {activeTab === 'following' && !user && <button onClick={() => { openLoginPopup(`${window.location.origin}${window.location.pathname}`); }} className="px-6 py-3 bg-white text-black font-semibold rounded-2xl text-sm">Sign In</button>}
                     </div>
                 )}
                 {posts.map((post, i) => (

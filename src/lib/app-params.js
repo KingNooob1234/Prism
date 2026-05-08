@@ -127,6 +127,60 @@ export const appParams = {
 	...getAppParams()
 }
 
+const getExpectedAuthOrigin = () => {
+	if (isNode || !appParams.appBaseUrl) {
+		return null;
+	}
+
+	try {
+		return new URL(appParams.appBaseUrl).origin;
+	} catch {
+		return null;
+	}
+}
+
+const normalizeToken = (value) => (value || '').replace(/^Bearer\s+/i, '');
+
+const saveAuthToken = (token) => {
+	if (!token || isNode) {
+		return false;
+	}
+
+	const normalizedToken = normalizeToken(token);
+	storage.setItem('base44_access_token', normalizedToken);
+	storage.setItem('token', normalizedToken);
+	return true;
+}
+
+const installAuthMessageListener = () => {
+	if (isNode || typeof window === 'undefined') {
+		return;
+	}
+
+	if (window.__prismAuthListenerInstalled) {
+		return;
+	}
+
+	window.__prismAuthListenerInstalled = true;
+	window.addEventListener('message', (event) => {
+		const expectedOrigin = getExpectedAuthOrigin();
+		if (expectedOrigin && event.origin !== expectedOrigin) {
+			return;
+		}
+
+		const accessToken = event?.data?.access_token;
+		if (!accessToken) {
+			return;
+		}
+
+		saveAuthToken(accessToken);
+		console.log('[Prism Auth] Received token from login popup ✅');
+		window.location.reload();
+	});
+}
+
+installAuthMessageListener();
+
 export const buildLoginUrl = (fromUrl) => {
 	if (isNode) {
 		return '';
@@ -146,4 +200,36 @@ export const buildLoginUrl = (fromUrl) => {
 	}
 
 	return loginUrl.toString();
+}
+
+export const openLoginPopup = (fromUrl) => {
+	if (isNode) {
+		return null;
+	}
+
+	const loginUrl = buildLoginUrl(fromUrl);
+	if (!loginUrl) {
+		return null;
+	}
+
+	const width = 520;
+	const height = 720;
+	const left = Math.round(window.screenX + (window.outerWidth - width) / 2);
+	const top = Math.round(window.screenY + (window.outerHeight - height) / 2);
+	const popupUrl = new URL(loginUrl);
+	popupUrl.searchParams.set('popup_origin', window.location.origin);
+
+	const popup = window.open(
+		popupUrl.toString(),
+		'base44_auth',
+		`width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
+	);
+
+	if (!popup) {
+		window.location.href = loginUrl;
+		return null;
+	}
+
+	popup.focus?.();
+	return popup;
 }

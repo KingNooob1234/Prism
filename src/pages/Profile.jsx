@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bookmark, Grid, LogIn, LogOut, Trash2, AlertCircle, Video, Settings, Camera } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
-import { buildLoginUrl } from '@/lib/app-params';
+import { openLoginPopup } from '@/lib/app-params';
 
 export default function Profile() {
     const [user, setUser] = useState(null);
@@ -52,7 +52,7 @@ export default function Profile() {
 
     const handleLogin = () => {
         const callbackUrl = `${window.location.origin}${window.location.pathname}`;
-        window.location.href = buildLoginUrl(callbackUrl);
+        openLoginPopup(callbackUrl);
     };
     const handleLogout = () => base44.auth.logout();
 
