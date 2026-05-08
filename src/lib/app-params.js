@@ -2,6 +2,8 @@ const isNode = typeof window === 'undefined';
 const windowObj = isNode ? { localStorage: new Map() } : window;
 const storage = windowObj.localStorage;
 
+const TOKEN_PARAM_CANDIDATES = ['access_token', 'accessToken', 'token', 'id_token', 'base44_access_token'];
+
 const toSnakeCase = (str) => {
 	return str.replace(/([A-Z])/g, '_$1').toLowerCase();
 }
@@ -23,6 +25,31 @@ const getHashParams = () => {
 		return new URLSearchParams();
 	}
 	return new URLSearchParams(hash.slice(queryIndex + 1));
+}
+
+const extractTokenFromLocation = () => {
+	if (isNode) {
+		return null;
+	}
+
+	const urlParams = new URLSearchParams(window.location.search);
+	const hashParams = getHashParams();
+
+	for (const key of TOKEN_PARAM_CANDIDATES) {
+		const urlToken = urlParams.get(key);
+		if (urlToken) {
+			return urlToken.replace(/^Bearer\s+/i, '');
+		}
+
+		const hashToken = hashParams.get(key);
+		if (hashToken) {
+			return hashToken.replace(/^Bearer\s+/i, '');
+		}
+	}
+
+	const raw = `${window.location.search || ''}&${window.location.hash || ''}`;
+	const fallbackMatch = raw.match(/(?:[?#&]|^)(?:access_token|accessToken|token|id_token|base44_access_token)=([^&#]+)/i);
+	return fallbackMatch ? decodeURIComponent(fallbackMatch[1]).replace(/^Bearer\s+/i, '') : null;
 }
 
 const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl = false } = {}) => {
@@ -64,7 +91,9 @@ const getAppParams = () => {
 		storage.removeItem('base44_token');
 		storage.removeItem('token');
 	}
+	const tokenFromLocation = extractTokenFromLocation();
 	const resolvedToken =
+		tokenFromLocation ||
 		getAppParamValue("access_token", { removeFromUrl: true }) ||
 		getAppParamValue("token", { removeFromUrl: true }) ||
 		storage.getItem('token') ||
