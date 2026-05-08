@@ -129,14 +129,17 @@ export const appParams = {
 
 const getExpectedAuthOrigin = () => {
 	if (isNode || !appParams.appBaseUrl) {
-		return null;
+		return [];
 	}
 
+	const origins = [];
 	try {
-		return new URL(appParams.appBaseUrl).origin;
+		origins.push(new URL(appParams.appBaseUrl).origin);
 	} catch {
-		return null;
+		// ignore invalid config
 	}
+	origins.push('https://app.base44.com');
+	return [...new Set(origins)];
 }
 
 const normalizeToken = (value) => (value || '').replace(/^Bearer\s+/i, '');
@@ -163,8 +166,9 @@ const installAuthMessageListener = () => {
 
 	window.__prismAuthListenerInstalled = true;
 	window.addEventListener('message', (event) => {
-		const expectedOrigin = getExpectedAuthOrigin();
-		if (expectedOrigin && event.origin !== expectedOrigin) {
+		const expectedOrigins = getExpectedAuthOrigin();
+		if (expectedOrigins.length && !expectedOrigins.includes(event.origin)) {
+			console.log('[Prism Auth] Ignored message from unexpected origin:', event.origin);
 			return;
 		}
 
